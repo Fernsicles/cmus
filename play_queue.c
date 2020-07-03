@@ -20,6 +20,7 @@
 #include "editable.h"
 #include "track.h"
 #include "xmalloc.h"
+#include "options.h"
 
 struct editable pq_editable;
 static struct editable_shared pq_editable_shared;
@@ -43,6 +44,7 @@ void play_queue_append(struct track_info *ti, void *opaque)
 	struct simple_track *t = simple_track_new(ti);
 
 	editable_add(&pq_editable, t);
+	editable_sort(&pq_editable);
 }
 
 void play_queue_prepend(struct track_info *ti, void *opaque)
@@ -50,6 +52,18 @@ void play_queue_prepend(struct track_info *ti, void *opaque)
 	struct simple_track *t = simple_track_new(ti);
 
 	editable_add_before(&pq_editable, t);
+	editable_sort(&pq_editable);
+}
+
+void play_queue_set_sort(sort_key_t *keys, sort_key_t *old_keys)
+{
+	if(pq_editable_shared.sort_keys != old_keys)
+	{
+		free(pq_editable_shared.sort_keys);
+	}
+	pq_editable_shared.sort_keys = keys;
+	sort_keys_to_str(keys, pq_editable_shared.sort_str, sizeof(pq_editable_shared.sort_str));
+	editable_sort(&pq_editable);
 }
 
 struct track_info *play_queue_remove(void)

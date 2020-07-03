@@ -30,6 +30,7 @@
 #include "worker.h"
 #include "uchar.h"
 #include "mergesort.h"
+#include "play_queue.h"
 
 #include <unistd.h>
 #include <stdio.h>
@@ -700,10 +701,10 @@ void pl_set_sort_str(const char *buf)
 	if (!keys)
 		return;
 
+	play_queue_set_sort(keys, pl_editable_shared.sort_keys);
 	editable_shared_set_sort_keys(&pl_editable_shared, keys);
 	sort_keys_to_str(keys, pl_editable_shared.sort_str,
 			sizeof(pl_editable_shared.sort_str));
-
 	struct playlist *pl;
 	list_for_each_entry(pl, &pl_head, node)
 		editable_sort(&pl->editable);
